@@ -3,19 +3,23 @@ import {AppBar, Box, Button, IconButton, Toolbar, Typography} from "@mui/materia
 import MenuIcon from '@mui/icons-material/Menu';
 import {getCurrentUser, logoutUser, onAuthChange} from "../../services/authService";
 import {useNavigate} from "react-router-dom";
+import {useSnackbar} from "../../components/SnackbarContext";
 
 const UserProfilePage = () => {
 
   const [user, setUser] = useState<any>(null);
   const navigate = useNavigate();
+  const {showMessage} = useSnackbar();
 
   useEffect(() => {
     const currentUser = getCurrentUser();
     if (currentUser) {
+      console.log('User', currentUser);
       setUser(currentUser);
     } else {
       const unsubscribe = onAuthChange((user) => {
         if (user) {
+          console.log('Unsubscribe', user);
           setUser(user);
         } else {
           navigate('/');
@@ -28,7 +32,7 @@ const UserProfilePage = () => {
 
   const logout = () => {
     logoutUser().then(r => {
-      console.log("logout", r);
+      showMessage('Logout successfully', 'success');
       navigate('/');
     });
   }
@@ -52,6 +56,7 @@ const UserProfilePage = () => {
           <Button color="inherit" onClick={logout}>Logout</Button>
         </Toolbar>
       </AppBar>
+
     </Box>
   )
 }

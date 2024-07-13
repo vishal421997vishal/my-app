@@ -1,10 +1,11 @@
-import {auth} from "./firebase/firebaseConfig";
+import {auth, firestore} from "./firebase/firebaseConfig";
 import {
   onAuthStateChanged,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut, UserCredential,} from "firebase/auth";
+import { collection, addDoc } from "firebase/firestore";
 
 // Function to register a new user with email and password
 export const registerUser = async (
@@ -42,4 +43,17 @@ export const onAuthChange = (callback: (user: any) => void) => {
 
 export const resetPassword = async (email: string): Promise<void> => {
   await sendPasswordResetEmail(auth, email);
+};
+
+export const logUserLocation = async (uid: string, location: { latitude: number; longitude: number }) => {
+  try {
+    const locationRef = collection(firestore, "users", uid, "locations");
+    await addDoc(locationRef, {
+      latitude: location.latitude,
+      longitude: location.longitude,
+      timestamp: new Date(),
+    });
+  } catch (error) {
+    console.error("Error logging location: ", error);
+  }
 };
