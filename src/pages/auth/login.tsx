@@ -1,11 +1,12 @@
-import {Box, Button, Container, TextField, Typography} from '@mui/material';
-import React from 'react';
+import {Box, Button, Container, IconButton, TextField, Typography} from '@mui/material';
+import React, {useState} from 'react';
 import {useForm} from "react-hook-form";
 import {yupResolver} from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import {Link, useNavigate} from "react-router-dom";
 import {loginUser} from "../../services/authService";
 import {useSnackbar} from "../../components/SnackbarContext";
+import {Visibility, VisibilityOff} from "@mui/icons-material";
 
 
 const validationSchema = yup.object({
@@ -24,11 +25,16 @@ const Login = () => {
     resolver: yupResolver(validationSchema),
   });
   const navigate = useNavigate();
-  const { showMessage } = useSnackbar();
+  const {showMessage} = useSnackbar();
+  const [showPassword, setShowPassword] = useState(false);
+
+  const onClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  }
 
   const onSubmit = async (data: any) => {
     try {
-     await loginUser(data.email, data.password);
+      await loginUser(data.email, data.password);
       showMessage('Login successfully', 'success');
       navigate('/user-profile');
     } catch (err: any) {
@@ -64,12 +70,21 @@ const Login = () => {
                 required
                 fullWidth
                 label="Password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 id="password"
                 autoComplete="current-password"
                 {...register('password')}
                 error={Boolean(errors.password)}
                 helperText={errors.password?.message}
+                InputProps={{
+                  endAdornment: (
+                    <IconButton
+                      onClick={onClickShowPassword}
+                      edge="end">
+                      {showPassword ? <VisibilityOff/> : <Visibility/>}
+                    </IconButton>
+                  )
+                }}
               />
               <div className='mt-5'>
                 <Button
